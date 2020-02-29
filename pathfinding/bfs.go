@@ -13,7 +13,17 @@ type SearchCell struct {
 	index *maze.CellIndex
 }
 
-func BFS(m *maze.Maze) (*SearchCell, uint64, error) {
+func BFS(m *maze.Maze) ([]*maze.CellIndex, uint64, error) {
+	cell, steps, err := bfs(m)
+	if err != nil {
+		return nil, steps, err
+	}
+
+	slice := SearchCellToSlice(cell)
+	return slice, steps, err
+}
+
+func bfs(m *maze.Maze) (*SearchCell, uint64, error) {
 	m.VisitCell(m.Start.Row, m.Start.Col)
 	start := SearchCell{
 		index: &m.Start,

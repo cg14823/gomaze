@@ -19,6 +19,10 @@ func (c *CellIndex) Equal(other *CellIndex) bool {
 	return c.Row == other.Row && c.Col == other.Col
 }
 
+func (c *CellIndex) GetID(cols int) int {
+	return (c.Row * cols) + c.Col
+}
+
 type Cell struct {
 	Top    bool
 	Bottom bool
@@ -36,15 +40,15 @@ func (c *Cell) Blocked() bool {
 }
 
 type Maze struct {
-	rows  int
-	cols  int
+	Rows  int
+	Cols  int
 	Start CellIndex
 	End   CellIndex
 	Cells [][]Cell
 }
 
 func (m *Maze) AsciiDraw() {
-	for i := 0; i < m.cols; i++ {
+	for i := 0; i < m.Cols; i++ {
 		fmt.Printf("___")
 	}
 
@@ -116,8 +120,8 @@ func (m *Maze) Create(rows, cols int) {
 	}
 
 	start := CellIndex{
-		Col: startRow,
-		Row: startCol,
+		Col: startCol,
+		Row: startRow,
 	}
 
 	endRow := startRow
@@ -179,7 +183,7 @@ func (m *Maze) join(row, col int) {
 	possible := make([]int, 0)
 	for i, neighbour := range indexes {
 		// outside maze
-		if neighbour.Col < 0 || neighbour.Col > m.cols-1 || neighbour.Row < 0 || neighbour.Row > m.rows-1 {
+		if neighbour.Col < 0 || neighbour.Col > m.Cols-1 || neighbour.Row < 0 || neighbour.Row > m.Rows-1 {
 			continue
 		}
 
@@ -235,7 +239,7 @@ func (m *Maze) getFrontierCell(row, col int) []CellIndex {
 
 	for _, neighbour := range indexes {
 		// outside maze
-		if neighbour.Col < 0 || neighbour.Col > m.cols-1 || neighbour.Row < 0 || neighbour.Row > m.rows-1 {
+		if neighbour.Col < 0 || neighbour.Col > m.Cols-1 || neighbour.Row < 0 || neighbour.Row > m.Rows-1 {
 			continue
 		}
 
@@ -248,9 +252,9 @@ func (m *Maze) getFrontierCell(row, col int) []CellIndex {
 }
 
 func (m *Maze) Image(outImage string) error {
-	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.cols, m.rows)
-	xDimension := m.cols*(cellWidth+wallWidth) + margin*2
-	yDimensions := m.rows*(cellHeight+wallWidth) + margin*2
+	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.Cols, m.Rows)
+	xDimension := m.Cols*(cellWidth+wallWidth) + margin*2
+	yDimensions := m.Rows*(cellHeight+wallWidth) + margin*2
 
 	img := generateEmptyImage(xDimension, yDimensions)
 
@@ -272,7 +276,7 @@ func (m *Maze) drawMap(img *image.RGBA, cellWidth, cellHeight, wallWidth, xOffse
 					A: 255,
 				})
 
-				paintExits(img, xOffset, yOffset, x, y, m.cols, m.rows, cellWidth, cellHeight, cellColor)
+				paintExits(img, xOffset, yOffset, x, y, m.Cols, m.Rows, cellWidth, cellHeight, cellColor)
 			} else if c.End {
 				cellColor = color.Color(color.RGBA{
 					R: 0,
@@ -281,7 +285,7 @@ func (m *Maze) drawMap(img *image.RGBA, cellWidth, cellHeight, wallWidth, xOffse
 					A: 255,
 				})
 
-				paintExits(img, xOffset, yOffset, x, y, m.cols, m.rows, cellWidth, cellHeight, cellColor)
+				paintExits(img, xOffset, yOffset, x, y, m.Cols, m.Rows, cellWidth, cellHeight, cellColor)
 			}
 
 			paintCell(img, xOffset, yOffset, cellWidth, cellHeight, cellColor)
@@ -337,9 +341,9 @@ func getMeasurements(cols, rows int) (int, int, int, int, int, int) {
 }
 
 func (m *Maze) ImageWithPath(path []*CellIndex, outImage string, cellColor color.Color) error {
-	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.cols, m.rows)
-	xDimension := m.cols*(cellWidth+wallWidth) + margin*2
-	yDimensions := m.rows*(cellHeight+wallWidth) + margin*2
+	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.Cols, m.Rows)
+	xDimension := m.Cols*(cellWidth+wallWidth) + margin*2
+	yDimensions := m.Rows*(cellHeight+wallWidth) + margin*2
 
 	img := generateEmptyImage(xDimension, yDimensions)
 
@@ -353,9 +357,9 @@ func (m *Maze) ImageWithPath(path []*CellIndex, outImage string, cellColor color
 }
 
 func (m *Maze) ImageWithMultiplePaths(paths [][]*CellIndex, outImage string, cellColors []color.Color) error {
-	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.cols, m.rows)
-	xDimension := m.cols*(cellWidth+wallWidth) + margin*2
-	yDimensions := m.rows*(cellHeight+wallWidth) + margin*2
+	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.Cols, m.Rows)
+	xDimension := m.Cols*(cellWidth+wallWidth) + margin*2
+	yDimensions := m.Rows*(cellHeight+wallWidth) + margin*2
 
 	img := generateEmptyImage(xDimension, yDimensions)
 
@@ -410,8 +414,8 @@ func removeWall(img *image.RGBA, x, y, cellWidth, cellHeight, wallWidth int, c *
 
 func NewMaze(rows, cols int) *Maze {
 	maze := &Maze{
-		rows: rows,
-		cols: cols,
+		Rows: rows,
+		Cols: cols,
 	}
 
 	maze.Create(rows, cols)

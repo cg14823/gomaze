@@ -6,7 +6,17 @@ import (
 	"github.com/cg14823/gomaze/maze"
 )
 
-func DFS(m *maze.Maze) (*SearchCell, uint64, error) {
+func DFS(m *maze.Maze) ([]*maze.CellIndex, uint64, error) {
+	cell, steps, err := dfs(m)
+	if err != nil {
+		return nil, steps, err
+	}
+
+	slice := SearchCellToSlice(cell)
+	return slice, steps, err
+}
+
+func dfs(m *maze.Maze) (*SearchCell, uint64, error) {
 	m.VisitCell(m.Start.Row, m.Start.Col)
 	start := SearchCell{
 		index: &m.Start,
