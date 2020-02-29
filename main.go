@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/cg14823/gomaze/maze"
 )
 
 func main() {
