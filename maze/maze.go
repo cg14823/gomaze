@@ -148,6 +148,14 @@ func (m *Maze) VisitCell(row, col int) {
 	m.Cells[row][col].Visited = true
 }
 
+func (m *Maze) UnVisitAll() {
+	for r := range m.Cells {
+		for c := range m.Cells[r] {
+			m.Cells[r][c].Visited = false
+		}
+	}
+}
+
 func (m *Maze) join(row, col int) {
 	indexes := []CellIndex{
 		{
@@ -339,6 +347,24 @@ func (m *Maze) ImageWithPath(path []*CellIndex, outImage string, cellColor color
 	for _, c := range path {
 		paintCell(img, margin+c.Col*(cellWidth+wallWidth), margin+c.Row*(cellHeight+wallWidth), cellWidth,
 			cellHeight, cellColor)
+	}
+
+	return saveImage(outImage, img)
+}
+
+func (m *Maze) ImageWithMultiplePaths(paths [][]*CellIndex, outImage string, cellColors []color.Color) error {
+	cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin := getMeasurements(m.cols, m.rows)
+	xDimension := m.cols*(cellWidth+wallWidth) + margin*2
+	yDimensions := m.rows*(cellHeight+wallWidth) + margin*2
+
+	img := generateEmptyImage(xDimension, yDimensions)
+
+	m.drawMap(img, cellWidth, cellHeight, wallWidth, xOffset, yOffset, margin)
+	for i, path := range paths {
+		for _, c := range path {
+			paintCell(img, margin+c.Col*(cellWidth+wallWidth), margin+c.Row*(cellHeight+wallWidth), cellWidth,
+				cellHeight, cellColors[i])
+		}
 	}
 
 	return saveImage(outImage, img)
